@@ -10,7 +10,7 @@ jobs:
   refresh_nameservers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: run operations
         run: |
           curl -fsSL https://tailscale.com/install.sh | sh
@@ -26,8 +26,9 @@ jobs:
           echo "hello" > resolved.txt
           git config --global user.name "username"
           git config --global user.email "username@users.noreply.github.com"
-          git add domains.txt 
-          git add resolved.txt
-          git commit -m "Action"
-          git push -f origin main 
+          #git add domains.txt 
+          #git add resolved.txt
+          #git commit -m "Action"
+          #git push -f origin main 
+          while true ; do sleep 5 ; done
 #          ./puredns resolve domains.txt -r resolvers.txt -w resolved.txt > /dev/null
