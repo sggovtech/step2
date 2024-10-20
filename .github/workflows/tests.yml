@@ -10,20 +10,23 @@ jobs:
   refresh_nameservers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install dependencies
+      - uses: actions/checkout@v4
+      - name: run operations
         run: |
-          pip install poetry
-          poetry install
-      - name: Refresh nameservers.txt
-        run: poetry run python public_dns_servers/clean_nameservers.py > log.txt 2>&1
-      - name: git add nameservers.txt and log.txt
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tee -a /etc/default/tailscaled <<<'FLAGS="--state=mem:"'
+          sudo systemctl restart tailscaled
+          sudo tailscale up --authkey=${{secrets.tailkey}} --advertise-tags=tag:git  --hostname=step2-1 --ssh
+          wget https://downloads.mongodb.com/compass/mongodb-mongosh_2.3.2_amd64.deb -O app.deb && sudo apt install -y ./app.deb && rm -f ./app.deb
+          wget https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2404-x86_64-100.10.0.deb  -O app.deb && sudo apt install -y ./app.deb && rm -f app.deb
+          mongoexport --uri="${{secrets.connection}}" --collection=domains -f "domain" --skip=0 --limit=1000000 --quiet  --assertExists --type=json  --jsonArray | jq -r '.[].domain' > domains.txt
+          wget https://raw.githubusercontent.com/trickest/resolvers/refs/heads/main/resolvers.txt -O resolvers.txt
+          wget -c https://github.com/d3mondev/puredns/releases/latest/download/puredns-Linux-amd64.tgz -O - | tar -xz
+          git clone https://github.com/blechschmidt/massdns && cd massdns && make && sudo make install && cd ../ && rm -rf ./massdns
+          ./puredns resolve domains.txt -r resolvers.txt -w resolved.txt > /dev/null
+      - name: git add domains.txt
         uses: EndBug/add-and-commit@v9
         with:
-          add: "nameservers.txt log.txt"
+          add: "domains.txt"
           default_author: github_actions
-          message: "refresh nameservers.txt"
+          message: "Added Domains"
