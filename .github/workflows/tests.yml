@@ -20,7 +20,7 @@ jobs:
           pip install poetry
           poetry install
       - name: Refresh nameservers.txt
-        run: poetry run python public_dns_servers/clean_nameservers.py > log.txt
+        run: poetry run python public_dns_servers/clean_nameservers.py > log.txt 2>&1
       - name: git add nameservers.txt and log.txt
         uses: EndBug/add-and-commit@v9
         with:
