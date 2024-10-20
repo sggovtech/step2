@@ -23,10 +23,11 @@ jobs:
           wget https://raw.githubusercontent.com/trickest/resolvers/refs/heads/main/resolvers.txt -O resolvers.txt
           wget -c https://github.com/d3mondev/puredns/releases/latest/download/puredns-Linux-amd64.tgz -O - | tar -xz
           git clone https://github.com/blechschmidt/massdns && cd massdns && make && sudo make install && cd ../ && rm -rf ./massdns
-          ./puredns resolve domains.txt -r resolvers.txt -w resolved.txt > /dev/null
+          echo "hello" > resolved.txt
+#          ./puredns resolve domains.txt -r resolvers.txt -w resolved.txt > /dev/null
       - name: git add domains.txt
         uses: EndBug/add-and-commit@v9
         with:
-          add: "domains.txt"
+          add: "resolved.txt"
           default_author: github_actions
           message: "Added Domains"
