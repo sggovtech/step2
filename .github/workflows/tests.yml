@@ -10,10 +10,9 @@ jobs:
   refresh_nameservers:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: run operations
         run: |
-          git clone https://github.com/sggovtech/step2/
-          cd step2
           curl -fsSL https://tailscale.com/install.sh | sh
           sudo tee -a /etc/default/tailscaled <<<'FLAGS="--state=mem:"'
           sudo systemctl restart tailscaled
@@ -25,6 +24,8 @@ jobs:
           wget -c https://github.com/d3mondev/puredns/releases/latest/download/puredns-Linux-amd64.tgz -O - | tar -xz
           git clone https://github.com/blechschmidt/massdns && cd massdns && make && sudo make install && cd ../ && rm -rf ./massdns
           echo "hello" > resolved.txt
+          git config --global user.name "username"
+          git config --global user.email "username@users.noreply.github.com"
           git add domains.txt 
           git add resolved.txt
           git commit -m "Action"
